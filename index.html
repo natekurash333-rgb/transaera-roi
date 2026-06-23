@@ -155,7 +155,7 @@
           <option value="k12">K-12</option>
           <option value="multifamily">Multifamily (adaptive reuse)</option>
           <option value="university_housing">University Housing</option>
-          <option value="senior_living">Senior Living (gas reheat)</option>
+          <option value="senior_living">Senior Living (gas-fired reheat)</option>
           <option value="generic" selected>Generic / Other</option>
         </select></label>
 
@@ -198,7 +198,7 @@
 </div></div>
 
 <div class="act dark"><div class="wrap">
-  <div class="actnum"><span class="n">02</span><div><h3 class="lt">The premium disappears</h3><div class="sub lt">3-year shared-savings · single unit</div></div></div>
+  <div class="actnum"><span class="n">02</span><div><h3 class="lt">The premium disappears</h3><div class="sub lt">3-year shared-savings · single unit · figures at 20-ton default</div></div></div>
   <p class="lede lt">$11,000 net premium, ~1.95-yr unfinanced payback. A sub-2-year asset doesn't want a long term — it wants fast financier recovery and quick ownership transfer. The developer puts in <strong style="color:#fff">$0</strong>.</p>
   <div class="dstats">
     <div class="dstat"><div class="l">Developer CapEx</div><div class="v">$0</div><div class="s">off the construction budget</div></div>
@@ -314,7 +314,7 @@ function render(){
   document.getElementById('tonsv').textContent = r.tons;
   const fuelLabel = r.v.fuel==='electric' ? 'electric' : r.v.fuel==='gas' ? 'gas' : 'no reheat';
   const reheatSub = r.v.fuel==='gas' ? num(r.rhTherms)+' therms/yr' : num(r.rhKwh)+' kWh/yr';
-  const pb = r.payback===null ? '—' : r.payback.toFixed(1);
+  const pb = r.payback===null ? '—' : r.payback.toFixed(2);
 
   document.getElementById('results').innerHTML = `
     <div class="stats">
