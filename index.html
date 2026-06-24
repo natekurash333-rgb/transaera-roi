@@ -134,6 +134,16 @@
   </div>
 </header>
 
+<!-- FRAMING BLOCK -->
+<section style="background:var(--bg);padding:22px 0 0">
+  <div class="wrap">
+    <div style="background:#fff;border-left:4px solid var(--cyan);border-radius:10px;padding:20px 24px;box-shadow:0 1px 3px rgba(15,23,42,.06)">
+      <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan);margin-bottom:8px">Reading the model</div>
+      <p style="font-size:15px;line-height:1.6;color:var(--ink);margin:0">The premium pencils differently depending on the market. An owner-occupier just buys it; the Sunbelt closes on performance; the Northeast closes on policy and financing. This tool models the unit economics underneath all three &mdash; the full territory read is in the one-pager.</p>
+    </div>
+  </div>
+</section>
+
 <!-- LIVE CALCULATOR -->
 <section class="calc"><div class="wrap">
   <h2 class="section">Live Estimator</h2>
@@ -161,7 +171,8 @@
 
       <label><span class="lab">Equipment Premium ($/ton)</span>
         <input id="premium" type="number" inputmode="decimal" placeholder="enter your equipment delta"/>
-        <span style="font-size:11px;color:#64748b;margin-top:4px;display:block">Leave blank to use the illustrative $850/ton default. Enter your real Transaera-vs-baseline delta for a project-specific number.</span></label>
+        <span style="font-size:11px;color:#64748b;margin-top:4px;display:block">Premium of the Transaera unit over a conventional DX DOAS, per ton. Leave blank for an illustrative $850/ton; enter your real delta for a project-specific number.</span>
+        <span id="premWarn" style="font-size:11px;color:#b45309;margin-top:4px;display:none;font-weight:600"></span></label>
     </div>
 
     <div class="card">
@@ -179,7 +190,7 @@
 <div class="hero"><div class="wrap">
   <p class="eyebrow">Transaera DOAS · Commercial ROI Engine</p>
   <h2>We don't sell the metal.<br/>We sell the financed yield.</h2>
-  <p>A MOF desiccant DOAS carries a capital premium. This model proves the premium isn't a cost problem — it's a financing problem, and the same instruments that scaled C&amp;I solar make it disappear off the developer's balance sheet.</p>
+  <p>A MOF desiccant DOAS carries a capital premium. This model proves the premium isn't a cost problem — it's a financing problem. That category's already solved; the only question this tool answers is whether the thermodynamics underneath are real.</p>
 </div></div>
 
 <div class="act tint"><div class="wrap">
@@ -206,7 +217,7 @@
     <div class="dstat"><div class="l">Developer keeps</div><div class="v accent">+$116</div><div class="s">/mo, cash-positive Day 1</div></div>
     <div class="dstat"><div class="l">Then owns it</div><div class="v">$5,652</div><div class="s">/yr after yr 3, $0 fee</div></div>
   </div>
-  <p style="margin-top:22px;font-size:13px;color:#94a3b8">Financier deploys $11,000, recovers it plus ~$1,778 over 3 years at 10%. A developer might <em>want</em> to stretch this to 10 years to cut the fee — but no EaaS platform papers an $11k deal at any term: it's below the ~$50–100k minimum where underwriting and servicing friction stop eating the spread. The single unit proves the thermodynamics. It can't be the business model. Act 3 is.</p>
+  <p style="margin-top:22px;font-size:13px;color:#94a3b8">Financier deploys $11,000, recovers it plus ~$1,778 over 3 years at 10%. Stretch the term to cut the fee and it changes nothing — an $11k ticket is under anyone's minimum. The single unit proves the thermodynamics; it can't be the business model. Act 3 is.</p>
   <div class="ctx">
     <div class="h">Baseline context · conservative Northern profile</div>
     <p>These numbers run a deliberately conservative <strong style="color:#fff">15% reheat firing fraction</strong> and Northern utility tariffs — the climate I model with absolute authority. In a target ERCOT / Gulf-Coast market, baseline DX DOAS reheat doesn't fire 15% of the time; it runs near-continuously wringing moisture out of 80°F-dewpoint air. The reheat-avoidance bucket — already the <em>larger</em> of the two streams — expands geometrically, and the payback compresses well below the 1.95-year figure shown. The model is sandbagged against my home turf; your market makes it stronger.</p>
@@ -215,11 +226,11 @@
 
 <div class="act tint"><div class="wrap">
   <div class="actnum"><span class="n">03</span><div><h3>The portfolio instrument</h3><div class="sub">10-year EaaS · where the structure earns its keep</div></div></div>
-  <p class="lede">The payback ratio is the same ~1.95 years at any size — bigger tonnage doesn't lengthen it. The long-dated EaaS is a portfolio instrument because of a hard supply-side floor: financiers won't underwrite below a <strong>~$50–100k minimum deal size</strong>. Clear that floor by aggregating buildings, and two things unlock — the deal is worth papering, and the developer gets the whole premium <strong>off-balance-sheet</strong> as OpEx.</p>
+  <p class="lede">The payback ratio is the same ~1.95 years at any size — bigger tonnage doesn't lengthen it. The long-dated EaaS is a portfolio instrument because one building doesn't clear minimum deal size and a portfolio does. Aggregate, and the premium goes OpEx.</p>
 
   <div class="card">
     <div class="k" style="font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--slate2)">One building — representative 25-ton central DOAS · adaptive reuse</div>
-    <p style="font-size:13px;color:var(--slate2);margin-top:4px">25-ton central DOAS decouples ventilation; VRF cassettes handle sensible. Still below the financier's minimum on its own — $13,750 won't clear a ~$50–100k floor. One building is the unit; the portfolio is the deal.</p>
+    <p style="font-size:13px;color:var(--slate2);margin-top:4px">25-ton central DOAS decouples ventilation; VRF cassettes handle sensible. At $13,750 it's still sub-minimum on its own. One building is the unit; the portfolio is the deal.</p>
     <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-top:16px">
       <div class="stat t-navy"><div class="l">Net premium</div><div class="v">$13,750</div><div class="s">$21,250 − ~$7,500 rebate</div></div>
       <div class="stat t-cyan"><div class="l">Savings</div><div class="v">$7,065<small>/yr</small></div><div class="s">twin-stream, 25-ton</div></div>
@@ -230,7 +241,7 @@
 
   <div style="margin-top:20px;background:var(--navy);border-radius:16px;padding:24px;color:#fff">
     <p style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan)">Scale to a boutique portfolio — 10 representative buildings</p>
-    <p style="font-size:13px;color:#cbd5e1;margin-top:4px">Now origination is trivial against the aggregate, and the financier has a real annuity. This is the deal that pencils.</p>
+    <p style="font-size:13px;color:#cbd5e1;margin-top:4px">Now origination is trivial against the aggregate. This is the deal that pencils.</p>
     <div class="dstats" style="margin-top:20px">
       <div class="dstat"><div class="l">Capital deployed</div><div class="v">$137,500</div><div class="s">across 10 buildings</div></div>
       <div class="dstat"><div class="l">Developer CapEx</div><div class="v accent">$0</div><div class="s">entire portfolio off-balance-sheet</div></div>
@@ -241,19 +252,27 @@
 </div></div>
 
 <div class="hero" style="padding:64px 0"><div class="wrap">
-  <p class="eyebrow">The beachhead</p>
-  <h2 style="font-size:30px">Congregate residential is where the split-incentive dies and the EaaS wins.</h2>
-  <p style="font-size:16px">University housing, senior living, K-12, and adaptive-reuse multifamily share the structure third-party ownership was built for: a developer who won't spend CapEx on a premium they don't operate, and a ventilation load the MOF wheel is thermodynamically built to crush. The unit economics are the proof; the portfolio is the product.</p>
+  <p style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan);margin-bottom:8px">The entry market</p>
+  <h2 style="font-size:30px;line-height:1.2">Congregate residential is where the owner captures the savings — and still finances the premium.</h2>
+  <p style="font-size:15px;line-height:1.6">University housing, senior living, K-12, adaptive-reuse multifamily: owners who capture the savings but won't tie up CapEx in a mechanical premium that competes with the building's core program — over a ventilation load the MOF wheel is built to crush. Not a split incentive to solve; a balance sheet to clear. The unit economics are the proof; the portfolio is the product.</p>
   <div class="pillrow">
     <span class="pill">University Housing</span><span class="pill">Senior Living</span><span class="pill">K-12</span><span class="pill">Multifamily (adaptive reuse)</span>
   </div>
   <div style="margin-top:28px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);border-radius:16px;padding:24px">
     <p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan);margin-bottom:12px">Upside not modeled in the numbers above</p>
     <p style="font-size:14px;color:#cbd5e1">
-      <strong style="color:#fff">§179D</strong> is a deduction (≈ value × marginal rate), up to ~$5/sf at prevailing wage — and often allocable to the <em>designer</em> when an adaptive-reuse owner's liability is already consumed by Historic and LIHTC credits. Layer <strong style="color:#fff">NYS Clean Heat</strong> and similar state decarbonization grants on top. None of it is in the payback — because you don't hand a developer a tax number their counsel hasn't blessed. It widens the margin; it doesn't carry the deal.</p>
+      <strong style="color:#fff">§179D</strong> is a deduction (≈ value × marginal rate), up to ~$5/sf at prevailing wage — and often allocable to the <em>designer</em> when an adaptive-reuse owner's liability is already consumed by Historic and LIHTC credits. Layer <strong style="color:#fff">NYS Clean Heat</strong> and similar state decarbonization grants on top. None of it is in the payback — the model holds it out until counsel blesses it. Margin upside, not the basis of the deal.</p>
   </div>
-  <p class="foot">ROM model. Rate, hours, rebate, and reheat firing-fraction are operator-calibrated assumptions — documented in the engine, verified per project before quoting. Reheat-avoidance assumes an electric-resistance baseline; against hot-gas reheat that bucket approaches zero, while continuous-occupancy (24/7) operation scales the cooling stream and offsets — both modeled per project. Built and audited via a Claude-builds / Gemini-stress-tests loop.</p>
+  <p class="foot">ROM model. Rate, hours, rebate, and reheat firing-fraction are operator-calibrated assumptions — documented in the engine, verified per project before quoting. Reheat-avoidance assumes an electric-resistance baseline; against hot-gas reheat that bucket approaches zero, while continuous-occupancy (24/7) operation scales the cooling stream and offsets — both modeled per project.</p>
 </div></div>
+
+<!-- TERRITORY PDF LINK -->
+<section style="background:var(--bg);padding:38px 0 56px;text-align:center">
+  <div class="wrap">
+    <a href="transaera_three_markets_final.pdf" target="_blank" rel="noopener" style="display:inline-block;background:var(--navy);color:#fff;font-weight:700;font-size:15px;text-decoration:none;padding:14px 30px;border-radius:10px">View the territory analysis (PDF) &rarr;</a>
+    <div style="font-size:12px;color:#64748b;margin-top:10px">The three-market read behind these numbers</div>
+  </div>
+</section>
 
 <script>
 /* ---- twin-stream engine (ported from calculateROI.ts) ---- */
@@ -271,7 +290,7 @@ const PREMIUM_DEFAULT = 850; // $/ton placeholder
 function resolveLocation(zip){
   const ny = /^13\d{3}$/.test(zip) || /^14[4-6]\d{2}$/.test(zip);
   return ny
-    ? {utility:'National Grid (upstate NY)', rate:0.15, gasRate:1.5, hours:2000, rebatePerTon:300, note:'Northern stub — conservative baseline.'}
+    ? {utility:'National Grid (upstate NY)', rate:0.15, gasRate:1.5, hours:2000, rebatePerTon:300, note:'Conservative Northern baseline.'}
     : {utility:'National default', rate:0.13, gasRate:1.4, hours:2000, rebatePerTon:0, note:'Out-of-territory fallback — verify rate & rebate.'};
 }
 
@@ -281,7 +300,13 @@ function calc(){
   const vKey = document.getElementById('vertical').value;
   const v = VERTICALS[vKey];
   const premiumIn = document.getElementById('premium').value.trim();
-  const premiumPerTon = premiumIn==='' ? PREMIUM_DEFAULT : Math.max(0, +premiumIn||0);
+  let premiumPerTon, premiumState;
+  if(premiumIn===''){ premiumPerTon=PREMIUM_DEFAULT; premiumState='default'; }
+  else { const pn=Number(premiumIn);
+    if(!isFinite(pn)||pn<=0){ premiumPerTon=PREMIUM_DEFAULT; premiumState='invalid'; }
+    else if(pn<100){ premiumPerTon=pn; premiumState='low'; }
+    else if(pn>3000){ premiumPerTon=pn; premiumState='high'; }
+    else { premiumPerTon=pn; premiumState='ok'; } }
   const loc = resolveLocation(zip);
 
   const coolKwh = v.coolKwPerTon*tons*loc.hours;
@@ -303,7 +328,7 @@ function calc(){
   const total = energySav+demandSav;
   const payback = net<=0 ? 0 : (total>0 ? net/total : null);
 
-  return {zip,tons,v,vKey,loc,premiumPerTon,coolAvoid,coolSav,rhKwh,rhTherms,rhSav,energySav,peakKw,demandSav,gross,rebate,net,total,payback};
+  return {zip,tons,v,vKey,loc,premiumPerTon,premiumState,coolAvoid,coolSav,rhKwh,rhTherms,rhSav,energySav,peakKw,demandSav,gross,rebate,net,total,payback};
 }
 
 const usd = n => '$'+Math.round(n).toLocaleString('en-US');
@@ -311,6 +336,15 @@ const num = n => Math.round(n).toLocaleString('en-US');
 
 function render(){
   const r = calc();
+  const pw = document.getElementById('premWarn');
+  const pmsg = {
+    invalid:'Enter a positive $/ton premium \u2014 using the $850 illustrative default.',
+    low:'That looks low for a per-ton premium (typical $100\u2013$3,000/ton). Double-check it\u2019s per ton.',
+    high:'That looks high for a per-ton premium (typical $100\u2013$3,000/ton). Double-check it\u2019s per ton.'
+  }[r.premiumState] || '';
+  pw.textContent = pmsg;
+  pw.style.display = pmsg ? 'block' : 'none';
+  document.getElementById('premium').style.borderColor = (r.premiumState==='invalid') ? '#dc2626' : '';
   document.getElementById('tonsv').textContent = r.tons;
   const fuelLabel = r.v.fuel==='electric' ? 'electric' : r.v.fuel==='gas' ? 'gas' : 'no reheat';
   const reheatSub = r.v.fuel==='gas' ? num(r.rhTherms)+' therms/yr' : num(r.rhKwh)+' kWh/yr';
@@ -334,7 +368,7 @@ function render(){
         <div class="sub">${reheatSub} · 90% cut @ ${r.v.reheatKwPerTon} kW/ton-eq</div></div>
     </div>
     <div class="prov">
-      <div class="head"><span class="t">Inputs &amp; Sources</span><span class="badge">Stubbed data — verify</span></div>
+      <div class="head"><span class="t">Inputs &amp; Sources</span><span class="badge">Illustrative — verify per project</span></div>
       <dl>
         <div><div class="k">Utility</div><div class="vv">${r.loc.utility}</div></div>
         <div><div class="k">Vertical</div><div class="vv">${r.v.label}</div></div>
@@ -346,7 +380,7 @@ function render(){
         <div><div class="k">Demand</div><div class="vv">$15/kW-mo × 6mo × 0.60</div></div>
         <div><div class="k">Firing fraction</div><div class="vv">15% (Northern conservative)</div></div>
       </dl>
-      <div class="note">${r.loc.note} Reheat firing fraction is a conservative Northern operating-average; high-dewpoint Sunbelt markets run materially higher, compressing payback further.</div>
+      <div class="note">${r.loc.note} The reheat assumption runs low for high-dewpoint Sunbelt markets, where the payback compresses further.</div>
     </div>
     <div class="upside">
       <div class="h">Upside Potential — not in payback above</div>
