@@ -160,14 +160,23 @@
         <div class="ends"><span>5</span><span>50</span></div>
       </div>
 
-      <label><span class="lab">Vertical (sets reheat baseline)</span>
+      <label><span class="lab">Building type</span>
         <select id="vertical">
           <option value="k12">K-12</option>
           <option value="multifamily">Multifamily (adaptive reuse)</option>
           <option value="university_housing">University Housing</option>
-          <option value="senior_living">Senior Living (gas-fired reheat)</option>
+          <option value="senior_living">Senior Living</option>
           <option value="generic" selected>Generic / Other</option>
         </select></label>
+
+      <label><span class="lab">Baseline reheat (what the incumbent unit uses)</span>
+        <select id="baseline">
+          <option value="hgr" selected>Hot-gas reheat (condenser reclaim)</option>
+          <option value="electric">Electric resistance</option>
+          <option value="hotwater">Hot-water (central plant)</option>
+          <option value="gas">Gas-fired (packaged)</option>
+        </select>
+        <span id="baseNote" style="font-size:11px;color:#64748b;margin-top:4px;display:none"></span></label>
 
       <label><span class="lab">Equipment Premium ($/ton)</span>
         <input id="premium" type="number" inputmode="decimal" placeholder="enter your equipment delta"/>
@@ -220,7 +229,7 @@
   <p style="margin-top:22px;font-size:13px;color:#94a3b8">Financier deploys $11,000, recovers it plus ~$1,778 over 3 years at 10%. A developer might <em>want</em> to stretch this to 10 years to cut the fee — but no EaaS platform papers an $11k deal at any term: it's below the ~$50–100k minimum where underwriting and servicing friction stop eating the spread. The single unit proves the thermodynamics. It can't be the business model. Act 3 is.</p>
   <div class="ctx">
     <div class="h">Baseline context · conservative Northern profile</div>
-    <p>These numbers run a deliberately conservative <strong style="color:#fff">15% reheat firing fraction</strong> and Northern utility tariffs — the climate I model with absolute authority. In a target ERCOT / Gulf-Coast market, baseline DX DOAS reheat doesn't fire 15% of the time; it runs near-continuously wringing moisture out of 80°F-dewpoint air. The reheat-avoidance bucket — already the <em>larger</em> of the two streams — expands geometrically, and the payback compresses well below the 1.95-year figure shown. The model is sandbagged against my home turf; your market makes it stronger.</p>
+    <p>The default models <strong style="color:#fff">hot-gas reheat</strong> — the common upstate baseline, where the incumbent gets its reheat free off condenser heat — so the payback rests entirely on the cooling stream. That's deliberately the hard case. Two things move it: switch the baseline to <strong style="color:#fff">electric-resistance reheat</strong>, where the incumbent burns kWh to reheat, and the avoided-reheat bucket reappears and pulls the payback toward two years; or move to a high-latent Sunbelt market, where the cooling stream itself expands as the system stops overcooling 80°F-dewpoint air. Sandbagged against my home turf, with the baseline that flatters the incumbent most — your market makes it stronger.</p>
   </div>
 </div></div>
 
@@ -263,19 +272,25 @@
     <p style="font-size:14px;color:#cbd5e1">
       <strong style="color:#fff">§179D</strong> is a deduction (≈ value × marginal rate), up to ~$5/sf at prevailing wage — and often allocable to the <em>designer</em> when an adaptive-reuse owner's liability is already consumed by Historic and LIHTC credits. Layer <strong style="color:#fff">NYS Clean Heat</strong> and similar state decarbonization grants on top. None of it is in the payback — because you don't hand a developer a tax number their counsel hasn't blessed. It widens the margin; it doesn't carry the deal.</p>
   </div>
-  <p class="foot">ROM model. Rate, hours, rebate, and reheat firing-fraction are operator-calibrated assumptions — documented in the engine, verified per project before quoting. Reheat-avoidance assumes an electric-resistance baseline; against hot-gas reheat that bucket approaches zero, while continuous-occupancy (24/7) operation scales the cooling stream and offsets — both modeled per project.</p>
+  <p class="foot">ROM model. Rate, hours, rebate, and reheat assumptions are operator-calibrated — documented in the engine, verified per project before quoting. The avoided-reheat bucket depends on the baseline selected: ~zero against hot-gas reheat, full against electric resistance, and in between for hot-water or gas-fired. Continuous-occupancy (24/7) operation scales the cooling stream — modeled per project.</p>
 </div></div>
 
 <script>
 /* ---- twin-stream engine (ported from calculateROI.ts) ---- */
 const KWH_TO_THERMS = 0.0341214;
-const DEF = { coolRed:0.35, reheatRed:0.90, peakKwPerTon:0.4, demandCharge:15, demandMonths:6, coincidence:0.6, gasEff:0.8 };
+const DEF = { coolRed:0.35, reheatRed:0.90, peakKwPerTon:0.4, demandCharge:15, demandMonths:6, coincidence:0.6, gasEff:0.81, hwEff:0.80 };
 const VERTICALS = {
-  k12:               {coolKwPerTon:1.2, reheatKwPerTon:0.5,  fuel:'electric', label:'K-12'},
-  multifamily:       {coolKwPerTon:1.2, reheatKwPerTon:0.55, fuel:'electric', label:'Multifamily'},
-  university_housing:{coolKwPerTon:1.2, reheatKwPerTon:0.5,  fuel:'electric', label:'University Housing'},
-  senior_living:     {coolKwPerTon:1.1, reheatKwPerTon:0.6,  fuel:'gas',      label:'Senior Living'},
-  generic:           {coolKwPerTon:1.2, reheatKwPerTon:0.5,  fuel:'electric', label:'Generic'},
+  k12:               {coolKwPerTon:1.2, reheatKwPerTon:0.5,  label:'K-12'},
+  multifamily:       {coolKwPerTon:1.2, reheatKwPerTon:0.55, label:'Multifamily'},
+  university_housing:{coolKwPerTon:1.2, reheatKwPerTon:0.5,  label:'University Housing'},
+  senior_living:     {coolKwPerTon:1.1, reheatKwPerTon:0.6,  label:'Senior Living'},
+  generic:           {coolKwPerTon:1.2, reheatKwPerTon:0.5,  label:'Generic'},
+};
+const BASELINES = {
+  hgr:      {label:'Hot-gas reheat'},
+  electric: {label:'Electric resistance'},
+  hotwater: {label:'Hot-water (central plant)'},
+  gas:      {label:'Gas-fired'},
 };
 const PREMIUM_DEFAULT = 850; // $/ton placeholder
 
@@ -291,6 +306,7 @@ function calc(){
   const tons = +document.getElementById('tons').value;
   const vKey = document.getElementById('vertical').value;
   const v = VERTICALS[vKey];
+  const baseKey = document.getElementById('baseline').value;
   const premiumIn = document.getElementById('premium').value.trim();
   let premiumPerTon, premiumState;
   if(premiumIn===''){ premiumPerTon=PREMIUM_DEFAULT; premiumState='default'; }
@@ -308,8 +324,10 @@ function calc(){
   const rhThermal = v.reheatKwPerTon*tons*loc.hours;
   const rhAvoid = rhThermal*DEF.reheatRed;
   let rhKwh=0, rhTherms=0, rhSav=0;
-  if(v.fuel==='electric'){ rhKwh=rhAvoid; rhSav=rhKwh*loc.rate; }
-  else if(v.fuel==='gas'){ rhTherms=(rhAvoid*KWH_TO_THERMS)/DEF.gasEff; rhSav=rhTherms*loc.gasRate; }
+  if(baseKey==='electric'){ rhKwh=rhAvoid; rhSav=rhKwh*loc.rate; }
+  else if(baseKey==='hotwater'){ rhTherms=(rhAvoid*KWH_TO_THERMS)/DEF.hwEff; rhSav=rhTherms*loc.gasRate; }
+  else if(baseKey==='gas'){ rhTherms=(rhAvoid*KWH_TO_THERMS)/DEF.gasEff; rhSav=rhTherms*loc.gasRate; }
+  // baseKey==='hgr': reheat reclaimed from condenser heat — avoided-reheat bucket is ~$0
 
   const energySav = coolSav+rhSav;
   const peakKw = DEF.peakKwPerTon*tons;
@@ -320,7 +338,7 @@ function calc(){
   const total = energySav+demandSav;
   const payback = net<=0 ? 0 : (total>0 ? net/total : null);
 
-  return {zip,tons,v,vKey,loc,premiumPerTon,premiumState,coolAvoid,coolSav,rhKwh,rhTherms,rhSav,energySav,peakKw,demandSav,gross,rebate,net,total,payback};
+  return {zip,tons,v,vKey,baseKey,loc,premiumPerTon,premiumState,coolAvoid,coolSav,rhKwh,rhTherms,rhSav,energySav,peakKw,demandSav,gross,rebate,net,total,payback};
 }
 
 const usd = n => '$'+Math.round(n).toLocaleString('en-US');
@@ -338,8 +356,19 @@ function render(){
   pw.style.display = pmsg ? 'block' : 'none';
   document.getElementById('premium').style.borderColor = (r.premiumState==='invalid') ? '#dc2626' : '';
   document.getElementById('tonsv').textContent = r.tons;
-  const fuelLabel = r.v.fuel==='electric' ? 'electric' : r.v.fuel==='gas' ? 'gas' : 'no reheat';
-  const reheatSub = r.v.fuel==='gas' ? num(r.rhTherms)+' therms/yr' : num(r.rhKwh)+' kWh/yr';
+  const fuelLabel = BASELINES[r.baseKey].label;
+  const reheatSub = (r.baseKey==='hotwater'||r.baseKey==='gas') ? num(r.rhTherms)+' therms/yr'
+                  : r.baseKey==='electric' ? num(r.rhKwh)+' kWh/yr'
+                  : 'reclaimed from condenser heat';
+  const bn = document.getElementById('baseNote');
+  const bmsg = {
+    hgr:'Condenser-reclaim reheat is essentially free, so the avoided-reheat bucket is ~$0. The case rests on the cooling stream.',
+    hotwater:'Valued as gas-fired hot water at 80% plant efficiency. Verify fuel and efficiency per plant (steam/oil/electric boilers differ).',
+    gas:'Valued at gas $/therm and 81% unit efficiency.',
+    electric:'Avoided reheat valued at full electric $/kWh (COP 1) — the most favorable baseline.'
+  }[r.baseKey] || '';
+  bn.textContent = bmsg;
+  bn.style.display = bmsg ? 'block' : 'none';
   const pb = r.payback===null ? '—' : r.payback.toFixed(2);
 
   document.getElementById('results').innerHTML = `
@@ -363,7 +392,8 @@ function render(){
       <div class="head"><span class="t">Inputs &amp; Sources</span><span class="badge">Illustrative — verify per project</span></div>
       <dl>
         <div><div class="k">Utility</div><div class="vv">${r.loc.utility}</div></div>
-        <div><div class="k">Vertical</div><div class="vv">${r.v.label}</div></div>
+        <div><div class="k">Building type</div><div class="vv">${r.v.label}</div></div>
+        <div><div class="k">Baseline reheat</div><div class="vv">${BASELINES[r.baseKey].label}</div></div>
         <div><div class="k">Energy rate</div><div class="vv">$${r.loc.rate.toFixed(3)}/kWh</div></div>
         <div><div class="k">Hours basis</div><div class="vv">${num(r.loc.hours)} hr — ventilation</div></div>
         <div><div class="k">Cooling</div><div class="vv">${r.v.coolKwPerTon} kW/ton · −35%</div></div>
@@ -384,7 +414,7 @@ function render(){
     </div>`;
 }
 
-['zip','tons','vertical','premium'].forEach(id=>{
+['zip','tons','vertical','baseline','premium'].forEach(id=>{
   const el=document.getElementById(id);
   el.addEventListener('input',render);
   el.addEventListener('change',render);
