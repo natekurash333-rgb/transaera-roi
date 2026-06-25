@@ -182,6 +182,10 @@
         <input id="premium" type="number" inputmode="decimal" placeholder="enter your equipment delta"/>
         <span style="font-size:11px;color:#64748b;margin-top:4px;display:block">Premium of the Transaera unit over a conventional DX DOAS, per ton. Leave blank for an illustrative $850/ton; enter your real delta for a project-specific number.</span>
         <span id="premWarn" style="font-size:11px;color:#b45309;margin-top:4px;display:none;font-weight:600"></span></label>
+
+      <label><span class="lab">Avoided electrical first-cost ($, optional)</span>
+        <input id="mca" type="number" inputmode="decimal" placeholder="0"/>
+        <span style="font-size:11px;color:#64748b;margin-top:4px;display:block">Installed cost the MOF unit avoids at lower MCA vs. the incumbent DX DOAS — smaller feeder, breaker, conductor, sometimes the service tap. A project-specific electrical-design number; leave blank to keep it out of the payback.</span></label>
     </div>
 
     <div class="card">
@@ -331,6 +335,9 @@ function calc(){
     else if(pn<100){ premiumPerTon=pn; premiumState='low'; }
     else if(pn>3000){ premiumPerTon=pn; premiumState='high'; }
     else { premiumPerTon=pn; premiumState='ok'; } }
+  const mcaIn = (document.getElementById('mca').value||'').trim();
+  let mcaOffset = Number(mcaIn);
+  if(mcaIn==='' || !isFinite(mcaOffset) || mcaOffset<0) mcaOffset = 0;
   const loc = resolveLocation(zip);
 
   const coolKwh = v.coolKwPerTon*tons*loc.hours;
@@ -350,11 +357,11 @@ function calc(){
   const demandSav = peakKw*DEF.demandCharge*DEF.demandMonths*DEF.coincidence;
   const gross = premiumPerTon*tons;
   const rebate = loc.rebatePerTon*tons;
-  const net = gross-rebate;
+  const net = gross-rebate-mcaOffset;
   const total = energySav+demandSav;
   const payback = net<=0 ? 0 : (total>0 ? net/total : null);
 
-  return {zip,tons,v,vKey,baseKey,loc,premiumPerTon,premiumState,coolAvoid,coolSav,rhKwh,rhTherms,rhSav,energySav,peakKw,demandSav,gross,rebate,net,total,payback};
+  return {zip,tons,v,vKey,baseKey,loc,premiumPerTon,premiumState,coolAvoid,coolSav,rhKwh,rhTherms,rhSav,energySav,peakKw,demandSav,gross,rebate,mcaOffset,net,total,payback};
 }
 
 const usd = n => '$'+Math.round(n).toLocaleString('en-US');
@@ -390,9 +397,9 @@ function render(){
   document.getElementById('results').innerHTML = `
     <div class="stats">
       <div class="stat t-navy"><div class="l">Net Premium Cost</div><div class="v tabnum">${usd(r.net)}</div>
-        <div class="s">${usd(r.gross)} gross − ${usd(r.rebate)} rebate</div></div>
+        <div class="s">${usd(r.gross)} gross − ${usd(r.rebate)} rebate${r.mcaOffset>0?' − '+usd(r.mcaOffset)+' avoided MCA':''}</div></div>
       <div class="stat t-green"><div class="l">Simple Payback</div><div class="v tabnum">${pb}<small>${r.payback===null?'':' yrs'}</small></div>
-        <div class="s">${r.net<=0?'Rebate covers premium':'Net premium ÷ '+usd(r.total)+'/yr total'}</div></div>
+        <div class="s">${r.net<=0?(r.mcaOffset>0?'Rebate + avoided MCA cover premium':'Rebate covers premium'):'Net premium ÷ '+usd(r.total)+'/yr total'}</div></div>
       <div class="stat t-cyan"><div class="l">Annual Energy Savings</div><div class="v tabnum">${usd(r.energySav)}</div>
         <div class="s">${usd(r.coolSav)} cooling · ${usd(r.rhSav)} reheat (${fuelLabel})</div></div>
       <div class="stat t-slate"><div class="l">Annual Demand Savings</div><div class="v tabnum">${usd(r.demandSav)}</div>
@@ -431,7 +438,7 @@ function render(){
     </div>`;
 }
 
-['zip','tons','vertical','baseline','premium'].forEach(id=>{
+['zip','tons','vertical','baseline','premium','mca'].forEach(id=>{
   const el=document.getElementById(id);
   el.addEventListener('input',render);
   el.addEventListener('change',render);
