@@ -278,7 +278,11 @@
 <script>
 /* ---- twin-stream engine (ported from calculateROI.ts) ---- */
 const KWH_TO_THERMS = 0.0341214;
-const DEF = { coolRed:0.35, reheatRed:0.90, peakKwPerTon:0.4, demandCharge:15, demandMonths:6, coincidence:0.6, gasEff:0.81, hwEff:0.80 };
+// coolRed here is the NATIONAL DEFAULT (0.30). resolveLocation() overrides it
+// per climate: Northern 0.27 / national 0.30 / high-latent Gulf Coast 0.35.
+// Cooling reduction scales with latent load — the flat 0.35 was Houston-earned
+// and shouldn't ride on a Syracuse default. See UI caveat in render().
+const DEF = { coolRed:0.30, reheatRed:0.90, peakKwPerTon:0.4, demandCharge:15, demandMonths:6, coincidence:0.6, gasEff:0.81, hwEff:0.80 };
 const VERTICALS = {
   k12:               {coolKwPerTon:1.2, reheatKwPerTon:0.5,  label:'K-12'},
   multifamily:       {coolKwPerTon:1.2, reheatKwPerTon:0.55, label:'Multifamily'},
@@ -295,10 +299,22 @@ const BASELINES = {
 const PREMIUM_DEFAULT = 850; // $/ton placeholder
 
 function resolveLocation(zip){
+  const z3 = zip.slice(0,3);
   const ny = /^13\d{3}$/.test(zip) || /^14[4-6]\d{2}$/.test(zip);
-  return ny
-    ? {utility:'National Grid (upstate NY)', rate:0.15, gasRate:1.5, hours:2000, rebatePerTon:300, note:'Conservative Northern baseline.'}
-    : {utility:'National default', rate:0.13, gasRate:1.4, hours:2000, rebatePerTon:0, note:'Out-of-territory fallback — verify rate & rebate.'};
+  // High-latent / Sunbelt high-dewpoint design markets — Gulf Coast + Florida.
+  // The 0.35 cooling reduction was earned in Houston (field-validated); it
+  // belongs here, not on a Northern default. Deliberately tight: arid West TX
+  // (798–799) is excluded, and borderline GA/SC fall through to national 0.30.
+  // FL 320–349 · SC coastal 294/295/299 (upstate excluded) · coastal GA 313–315
+  // · AL 350–369 · MS-south 390–397 · LA 700–714 · SE-TX/Houston/Victoria 770–779
+  // · Corpus + Rio Grande Valley 783–785. Inland tier held at 0.30 (Atlanta/Memphis/
+  // San Antonio/Austin) for consistency; arid West TX (79x) excluded. Note 295 is a
+  // ZIP3 collision (Myrtle Beach coast + Florence Pee Dee) — both ride in, both humid.
+  const highLatent = /^(3[2-4]\d|29[459]|31[3-5]|3[56]\d|39[0-7]|70\d|71[0-4]|77\d|78[3-5])/.test(z3);
+
+  if(ny) return {utility:'National Grid (upstate NY)', rate:0.15, gasRate:1.5, hours:2000, rebatePerTon:300, coolRed:0.27, note:'Conservative Northern baseline.'};
+  if(highLatent) return {utility:'National default · high-latent', rate:0.13, gasRate:1.4, hours:2000, rebatePerTon:0, coolRed:0.35, note:'High-dewpoint market — cooling reduction runs higher (0.35, Houston-earned). Verify rate & rebate.'};
+  return {utility:'National default', rate:0.13, gasRate:1.4, hours:2000, rebatePerTon:0, coolRed:DEF.coolRed, note:'Out-of-territory fallback — verify rate & rebate.'};
 }
 
 function calc(){
@@ -318,7 +334,7 @@ function calc(){
   const loc = resolveLocation(zip);
 
   const coolKwh = v.coolKwPerTon*tons*loc.hours;
-  const coolAvoid = coolKwh*DEF.coolRed;
+  const coolAvoid = coolKwh*loc.coolRed;
   const coolSav = coolAvoid*loc.rate;
 
   const rhThermal = v.reheatKwPerTon*tons*loc.hours;
@@ -384,7 +400,7 @@ function render(){
     </div>
     <div class="twin">
       <div class="cool"><div class="k">Cooling stream</div><div class="big tabnum">${usd(r.coolSav)}/yr</div>
-        <div class="sub">${num(r.coolAvoid)} kWh/yr · 35% compressor cut @ ${r.v.coolKwPerTon} kW/ton</div></div>
+        <div class="sub">${num(r.coolAvoid)} kWh/yr · ${Math.round(r.loc.coolRed*100)}% compressor cut @ ${r.v.coolKwPerTon} kW/ton</div></div>
       <div class="reheat"><div class="k">Reheat stream (${fuelLabel})</div><div class="big tabnum">${usd(r.rhSav)}/yr</div>
         <div class="sub">${reheatSub} · 90% cut @ ${r.v.reheatKwPerTon} kW/ton-eq</div></div>
     </div>
@@ -396,13 +412,14 @@ function render(){
         <div><div class="k">Baseline reheat</div><div class="vv">${BASELINES[r.baseKey].label}</div></div>
         <div><div class="k">Energy rate</div><div class="vv">$${r.loc.rate.toFixed(3)}/kWh</div></div>
         <div><div class="k">Hours basis</div><div class="vv">${num(r.loc.hours)} hr — ventilation</div></div>
-        <div><div class="k">Cooling</div><div class="vv">${r.v.coolKwPerTon} kW/ton · −35%</div></div>
+        <div><div class="k">Cooling</div><div class="vv">${r.v.coolKwPerTon} kW/ton · −${Math.round(r.loc.coolRed*100)}%</div></div>
         <div><div class="k">Reheat</div><div class="vv">${r.v.reheatKwPerTon} kW/ton-eq ${fuelLabel} · −90%</div></div>
         <div><div class="k">Premium</div><div class="vv">$${num(r.premiumPerTon)}/ton</div></div>
         <div><div class="k">Demand</div><div class="vv">$15/kW-mo × 6mo × 0.60</div></div>
         <div><div class="k">Firing fraction</div><div class="vv">15% (Northern conservative)</div></div>
       </dl>
-      <div class="note">${r.loc.note} The reheat assumption runs low for high-dewpoint Sunbelt markets, where the payback compresses further.</div>
+      <div class="note">${r.loc.note} Cooling reduction scales with latent load — conservative in dry/Northern climates, higher in high-dewpoint markets; verify per project. The reheat assumption likewise runs low in those Sunbelt markets, where payback compresses further.</div>
+      <div class="note" style="margin-top:8px">Standardized regional weather baselines. High-occupancy, continuous 24/7 runtime, or process-air loads (labs, cleanrooms, commercial kitchens) can exceed these defaults — those warrant a custom bin-hour analysis, not a screening estimate.</div>
     </div>
     <div class="upside">
       <div class="h">Upside Potential — not in payback above</div>
